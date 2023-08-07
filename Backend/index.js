@@ -1,14 +1,39 @@
-require('dotenv').config();
-const express = require('express');
-const app = express();
+const express = require("express");
 const cors = require("cors");
-const connection = require('./db');
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const UserRoutes = require("../Backend/Routes/UserRoutes");
+require("dotenv").config();
 
-//DB connection
-connection();
+const app = express();
 
-//middlewares
-app.use(express.json())
-app.use(cors());
+// Middleware
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 
-app.listen(8080,()=>console.log('Server running @ 8080'));
+app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Routes
+app.use("/", UserRoutes);
+
+mongoose
+  .connect(process.env.DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("connected to mongoose");
+  })
+  .catch((err) => {
+    console.log(err.message);
+    console.log("not connected to db");
+  });
+
+app.listen(4000, () => console.log("Server running @ 4000"));

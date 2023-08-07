@@ -1,3 +1,7 @@
-const UserRouter = require('express').Router();
+const express = require("express");
+const UserRouter = express.Router();
+const UserController = require("../Controller/UserController");
 
-module.exports = UserRouter
+UserRouter.post("/signup", UserController.UserReg);
+
+module.exports = UserRouter;
