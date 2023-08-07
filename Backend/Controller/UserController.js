@@ -1,5 +1,6 @@
 const UserModel = require('../Model/userModels');
 const bcrypt = require('bcrypt');
+const { json } = require('body-parser');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -23,6 +24,28 @@ const UserReg = async (req,res) => {
     }
 }
 
+const UserLogin = async (req,res) =>{
+    try {
+        console.log('inside user login controller');
+        const {email,password} = req.body
+        const exists = await UserModel.findOne({email:email})
+        if(exists){
+            const access =await bcrypt.compare(password,exists.password)
+            if(access){
+                const token = jwt.sign({ userId: access._id },process.env.JWTKEY,{expiresIn: "1min"})
+                return res.status(200).json({user:exists,token:token,message:"login",status:true})
+            }else{
+                return res.status(201).json({ alert: "Password is wrong", status: false });
+            }
+        }else{
+            return res.status(201).json({ alert: "No Account in this Email", status: false });
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 module.exports={
-    UserReg
+    UserReg,
+    UserLogin
 }
