@@ -3,6 +3,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const UserRoutes = require("../Backend/Routes/UserRoutes");
+const AdminRoutes = require("../Backend/Routes/AdminRoutes")
 require("dotenv").config();
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use("/", UserRoutes);
+app.use("/admin", AdminRoutes);
 
 mongoose
   .connect(process.env.DB, {

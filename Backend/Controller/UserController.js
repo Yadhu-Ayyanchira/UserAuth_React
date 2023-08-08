@@ -1,6 +1,7 @@
 const UserModel = require('../Model/userModels');
 const bcrypt = require('bcrypt');
 const { json } = require('body-parser');
+const { response } = require('express');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -45,7 +46,26 @@ const UserLogin = async (req,res) =>{
     }
 }
 
+const updateImage = async (req, res) => {
+  console.log("in up img");
+  try {
+    const id = req.body.userId;
+    const image = req.file.filename;
+    const updateImg = await UserModel.findOneAndUpdate(
+      { _id: id },
+      { $set: { image: image } },
+      { new: true }
+    ); // Removed .then and the unnecessary response parameter
+
+    // Sending response after the update
+    res.json({ updated: true, data: updateImg });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports={
     UserReg,
-    UserLogin
+    UserLogin,
+    updateImage
 }
