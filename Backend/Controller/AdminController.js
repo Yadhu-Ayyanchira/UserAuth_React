@@ -1,19 +1,19 @@
-const Admin = require("../Model/AdminModel");
 const User = require("../Model/userModels");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const AdminLogin = async (req, res) => {
+    console.log('inner of admin');
   try {
     const { email, password } = req.body;
-    const exists = await Admin.findOne({ email: email });
+    const exists = await User.findOne({ email: email });
 
     if (exists) {
-      if (password === exists.password) {
+        const access = await bcrypt.compare(password,exists.password)
+      if (access && exists.is_admin===true) {
         const token = jwt.sign({ adminId: exists._id }, "jwtSecret", {
           expiresIn: "1m",
         });
-        console.log(token, "TOKEN");
         return res
           .status(200)
           .json({
@@ -110,8 +110,9 @@ const addUser = async (req, res) => {
       const newUser = await User.create({
         name: name,
         email: email,
-        mobile: mobile,
+        mob: mobile,
         password: hashPassword,
+        is_admin:false
       });
       const token = jwt.sign({ userId: newUser._id }, "jwtSecret", {
         expiresIn: "1m",
